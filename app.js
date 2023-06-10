@@ -1,41 +1,30 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const ejs = require("ejs")
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//引入各方路由
+const admin = require("./routes/admin")
+const index = require("./routes/index")
+const api = require("./routes/api")
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+//配置模板引擎
+app.set('html', ejs.__express);
+app.set('view engine', 'html');
 
-app.use(logger('dev'));
+app.use(express.static("static"));
+
+//获取post提交的数据
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+//后台
+app.use('/admin', admin);
+//api接口
+app.use('/api', api);
+//前台
+app.use("/",index)
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+app.listen(3000)
 
 module.exports = app;
